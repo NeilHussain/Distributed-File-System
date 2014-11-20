@@ -1,10 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "clientSNFS.h"
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
 
 void OpenSocket(char* ip, int port){
 
 setServer(ip, port);
+
 
 
 }

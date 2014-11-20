@@ -1,5 +1,5 @@
 COMPILER = gcc
-CCFLAGS = -Wall -std=c99 -lpthread
+CCFLAGS = -Wall -std=c99
 
 all:clientapp serverSNFS
 
@@ -8,7 +8,7 @@ clientapp: clientapp.o clientSNFS.o
 	$(COMPILER) $(CCFLAGS) clientapp.o clientSNFS.o -o clientapp
 
 serverSNFS: serverSNFS.o 
-	$(COMPILER) $(CCFLAGS) serverSNFS.o -o serverSNFS
+	$(COMPILER) $(CCFLAGS) serverSNFS.o -lpthread -o serverSNFS
 
 serverSNFS.o: serverSNFS.c
 	$(COMPILER) $(CCFLAGS) -c serverSNFS.c

@@ -1,13 +1,61 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <strings.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
+
 #include "clientSNFS.h"
 
+#define h_addr h_addr_list[0] /* for backward compatibility */
+
+void error(const char *msg)
+{
+    perror(msg);
+    exit(0);
+}
+
 //Sets the server of the client with the params
-void setServer(char* IP, int port){
+void setServer(char* serverIdent, int port){
 
-printf("cool go to openSocket\n");
-printf("IP: %s, Port: %d\n",IP, port);
+	printf("cool got to openSocket\n");
+	printf("IP: %s, Port: %d\n",serverIdent, port);
+	
+	struct sockaddr_in serv_addr;
+	struct hostent *server;
+	
+   	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+   	if (sockfd < 0) 
+        error("ERROR opening socket");
+    
+	//##gets the host of the server by the given host name or IP##//
+	
+	server = gethostbyname(serverIdent);
+	
+	if(server == NULL){
+	server = gethostbyaddr(serverIdent, 4, AF_INET);
+	}	 
 
+	if (server == NULL) {
+        fprintf(stderr,"ERROR, no such host\n");
+        exit(0);
+    	}
+
+	//########################################################/
+
+	// Fills structs
+    	bzero((char *) &serv_addr, sizeof(serv_addr));
+    	serv_addr.sin_family = AF_INET;
+    	
+	bcopy((char *)server->h_addr, 
+        (char *)&serv_addr.sin_addr.s_addr, server->h_length);
+   	serv_addr.sin_port = htons(port);
+   	
+	//attempts to the connect
+	if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+        error("ERROR connecting");
 
 }
 

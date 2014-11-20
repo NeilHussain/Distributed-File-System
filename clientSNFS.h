@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
+
 //void PrintInstruction(FILE * outfile, Instruction * instr);
 //void PrintInstructionList(FILE * outfile, Instruction * instr);
 
@@ -14,7 +15,7 @@ time_t access_time;
 time_t mod_time;
 };
 
-extern void setServer(char* IP, int port);
+extern void setServer(char* serverIdent, int port);
 extern int openFile(char *name);
 extern int readFile(int fd, void *buf);
 extern int writeFile(int fd, void *buf);
