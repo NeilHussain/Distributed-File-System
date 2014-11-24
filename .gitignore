@@ -1,0 +1,6 @@
+clientSNFS.o
+clientapp.o
+serverSNFS.o
+clientapp
+serverSNFS
+clientSNFS.h.gch
