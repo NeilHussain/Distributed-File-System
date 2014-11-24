@@ -23,3 +23,4 @@ clientapp.o: clientapp.c clientSNFS.h
 clean:
 	rm -f *.o
 	rm -f fileFullPath.txt
+	rm -f clientapp serverSNFS
