@@ -78,7 +78,7 @@ while (1) {
 	pthread_t *server = malloc(sizeof(pthread_t));
 	int ret = pthread_create(server, NULL, Server_Thread, &newsockfd);
 
-	if(ret < 0)
+	if(ret != 0)
 		error("Error making new thread");
 
 }
@@ -103,15 +103,37 @@ int main(int argc, char *argv[]){
 	char* filepath;
 
 
-	if(argc != 3){
-		printf("Invalid argument number: serverSNFS takes 2 arguments\n		TCP Port Number, filepath\n" );
-
+	
+ 
+	if(argc != 5){
+		printf("Invalid argument number: serverSNFS takes 5 arguments\n" );
+		return 0;
 	}else{
-		port = atoi(argv[1]);
-		filepath = argv[2];
-	}
+		if(!strcmp(argv[1], "-port"))
+			port = atoi(argv[2]);
+		else{
+			printf("Wrong argument formatting!\n");
+			return 0;
+		}
+		if(!strcmp(argv[3], "-mount")){
+			filepath = argv[4];
+			int status;
+			status = mkdir(filepath,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+			if(status){
+				if(errno == EEXIST)
+					error("directory already in use");
+				else
+					error("Some error occurs in directory creation");
+			}
+			
+		}
+		else{
+			printf("Wrong argument formatting!\n");
+			return 0;
+		}
 
-	printf("Port: %d, Filepath: %s", port, filepath);
+ 
+	printf("Port: %d, Filepath: %s\n", port, filepath);	
 	//DO some error handling
 
 	acceptConnections(port);
