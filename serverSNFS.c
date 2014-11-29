@@ -8,7 +8,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
-
+#include <errno.h>
+#include <sys/stat.h>
 void error(char *msg)
 {
     perror(msg);
@@ -131,6 +132,7 @@ int main(int argc, char *argv[]){
 			printf("Wrong argument formatting!\n");
 			return 0;
 		}
+	}
 
  
 	printf("Port: %d, Filepath: %s\n", port, filepath);	
