@@ -8,10 +8,10 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <strings.h>
-
 #include "clientSNFS.h"
-
 #define h_addr h_addr_list[0] /* for backward compatibility */
+
+int sockfd;
 
 void error(const char *msg)
 {
@@ -28,7 +28,7 @@ void setServer(char* serverIdent, int port){
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
 	
-   	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+   	sockfd = socket(AF_INET, SOCK_STREAM, 0);
    	if (sockfd < 0) 
         error("ERROR opening socket");
     
@@ -62,7 +62,7 @@ void setServer(char* serverIdent, int port){
 	char *buffer;
 	//bzero(buffer, 256);
 
-	buffer = "helloworld";
+	buffer = "ohelloworld.txt";
 	//strcpy(buffer, "hello world!");
 
 	printf("Buffer Client: %s", buffer);
@@ -71,6 +71,8 @@ void setServer(char* serverIdent, int port){
 		error("Sending error");
 		exit(1);
 	}
+
+	
 
 }
 
@@ -88,8 +90,14 @@ void testCommand(char* string){
 //Tries to open the file (can fail)
 //returns file descriptor if successful, -1 if failure
 int openFile(char *name){
+	
+	char *buffer = "";
+	buffer[0] = 'o';
+	buffer = strcat(buffer, name);
+	printf("ClientSNFS: %s", buffer);
+	int n = write(sockfd,buffer,strlen(buffer));
 
-return -1;
+return n;
 }
 
 //Attempts to read entire file

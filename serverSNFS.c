@@ -1,3 +1,5 @@
+#define _BSD_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -10,12 +12,53 @@
 #include <pthread.h>
 #include <errno.h>
 #include <sys/stat.h>
-void error(char *msg)
-{
+
+char* baseFilepath;
+
+struct permission{
+
+int threadID;
+
+int read;
+int write;
+
+struct permission* nextPerm;
+
+};
+
+typedef struct permission* permPtr;
+
+void error(char *msg){
+
     perror(msg);
     exit(1);
 }
 
+int readFile(){
+
+
+return 1;
+}
+
+int openFile(char* name){
+
+FILE *fp;
+fp = fopen(name, "rw");
+
+
+
+return 1;
+
+}
+
+char* parseFilename(char* buffer){
+
+  int length = strlen(buffer);
+  char* filename = malloc(sizeof(char)* (length-1));
+  strncpy(filename, buffer+1, length);
+
+return filename;
+}
 
 
 void* Server_Thread(void* socket_ptr){
@@ -33,11 +76,63 @@ int socketNum = *socket;
 		exit(1);
 	}
 
-	printf("Buffer: %s\n", buffer);
+	//printf("Buffer: %s\n", buffer);
 
-	//while(1){
-	printf("Running: %d\n\n", socketNum);
-	//}
+	while(1){
+		//printf("Running: %d\n\n", socketNum);
+	
+		int n = read(*socket ,buffer, 255);
+		//buffer[0] = 
+		   //r = read, o = open, w = write, c = close s = statFile		
+	
+		if(n < 0){
+			error("Sending error");
+			exit(1);
+		}
+
+		switch (buffer[0]){
+			case 'h':
+				printf("Buffer: %s, Length: %d",buffer, (int)strlen(buffer));
+							
+				bzero(buffer, 256);
+			break;
+			case 'r':
+				readFile();
+				bzero(buffer, 256);
+				break;
+			case 'o':
+				//char filename; 
+				//const char filename = malloc(sizeof(char)* (strlen(buffer) -1));
+				{
+				   char* filename = parseFilename(buffer);
+				   //printf("Filename: %s\n", filename);
+					
+				   filename = strcat(baseFilepath, filename);
+
+				  // printf("File path: %s\n", filename);
+				   openFile(filename);				
+				   bzero(buffer, 256);
+				}
+				break;
+			case 'w':
+				break;
+			case 'c':
+				break;
+			case 's':
+				printf("Howdy from %d\n\n", socketNum);
+					
+
+				bzero(buffer, 256);				
+				break;
+			default:
+				//printf("Got some message: %c on socket: %d\n", buffer[0], socketNum);
+				bzero(buffer, 256);
+				usleep(100);
+			
+				break;
+		}
+		
+	}
 
 close(*socket);
 
@@ -67,7 +162,7 @@ void acceptConnections(int port){
 
 while (1) {
 
-	printf("~While loop~\n");        
+	//printf("~While loop~\n");        
 
 	 int newsockfd = accept(sockfd, 
                (struct sockaddr *) &cli_addr, &clilen);
@@ -93,10 +188,6 @@ while (1) {
 
 /* end of while */
 
-
-
-
-
 }
 
 int main(int argc, char *argv[]){
@@ -120,11 +211,15 @@ int main(int argc, char *argv[]){
 			filepath = argv[4];
 			int status;
 			status = mkdir(filepath,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+			
 			if(status){
-				if(errno == EEXIST)
+
+				baseFilepath = filepath;
+				//Don't need an error here, just use that path when making/reading files
+				/*if(errno == EEXIST)
 					error("directory already in use");
 				else
-					error("Some error occurs in directory creation");
+					error("Some error occurs in directory creation");*/
 			}
 			
 		}
