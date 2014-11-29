@@ -27,6 +27,7 @@ int main(int argc, char *argv[]){
 	char* filename;
 
 	if(argc != 4){
+		printf("Wrong number of arguments!\n");
 		return 0;
 	}else{
 		IP = argv[1];

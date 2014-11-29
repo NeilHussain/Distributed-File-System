@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
-
+#include <string.h>
 #include "clientSNFS.h"
 
 #define h_addr h_addr_list[0] /* for backward compatibility */
@@ -56,7 +56,10 @@ void setServer(char* serverIdent, int port){
 	//attempts to the connect
 	if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
         error("ERROR connecting");
-
+	
+	char* buffer;
+	buffer = "Hi!!!!";
+	write(sockfd, buffer, strlen(buffer));
 }
 
 //Tries to open the file (can fail)

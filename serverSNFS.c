@@ -53,6 +53,10 @@ void acceptConnections(int port){
 	if (newsockfd < 0) 
              error("ERROR on accept");
 	printf("connection successful\n");
+
+	char buffer[1024];
+	read(newsockfd, buffer, 255);
+	printf("Msg from client: %s\n", buffer);
 	/*
 	pthread_t *server = malloc(sizeof(pthread_t));
 	int ret = pthread_create(server, NULL, Server_Thread, NULL);
@@ -76,11 +80,10 @@ void acceptConnections(int port){
         else close(newsockfd);*/
 
      } 
-
+	
 
 
 /* end of while */
-
 
 
 
