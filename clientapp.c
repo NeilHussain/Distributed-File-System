@@ -3,9 +3,10 @@
 #include "clientSNFS.h"
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <string.h>
 #include <netinet/in.h>
 #include <netdb.h> 
-
+#include <strings.h>
 void OpenSocket(char* ip, int port){
 
 setServer(ip, port);
@@ -20,14 +21,16 @@ void OpenFile(char* filename){
 
 }
 
+
 int main(int argc, char *argv[]){
 
+
+	//ARGS: IP PORT FILENAME
 	char* IP = "";
 	int port = 0;
 	char* filename;
 
 	if(argc != 4){
-		printf("Wrong number of arguments!\n");
 		return 0;
 	}else{
 		IP = argv[1];
@@ -39,7 +42,7 @@ int main(int argc, char *argv[]){
 	OpenFile(filename);
 	OpenSocket(IP,port);
 
-	
+
 
 	//printf("Clientapp\n");
 	return 0;

@@ -8,8 +8,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
-#include <sys/stat.h>
-#include <errno.h>
 
 void error(char *msg)
 {
@@ -17,16 +15,36 @@ void error(char *msg)
     exit(1);
 }
 
-void* Server_Thread(void* args){
 
-printf("Connection accepted");
+
+void* Server_Thread(void* socket_ptr){
+
+int* socket = (int*) socket_ptr;
+int socketNum = *socket;
+
+	char buffer[1024];
+	//bzero(buffer, 256);
+
+	int n = read(*socket ,buffer, 255);
+	
+	if(n < 0){
+		error("Sending error");
+		exit(1);
+	}
+
+	printf("Buffer: %s\n", buffer);
+
+	//while(1){
+	printf("Running: %d\n\n", socketNum);
+	//}
+
+close(*socket);
 
 return NULL;
 }
 
 void acceptConnections(int port){
 
-	printf("Connections Acceptor\n");
 	socklen_t clilen;
      struct sockaddr_in serv_addr, cli_addr;
  
@@ -37,53 +55,43 @@ void acceptConnections(int port){
      serv_addr.sin_family = AF_INET;
      serv_addr.sin_addr.s_addr = INADDR_ANY;
      serv_addr.sin_port = htons(port);
-     if (bind(sockfd, (struct sockaddr *) &serv_addr,
+     
+	if (bind(sockfd, (struct sockaddr *) &serv_addr,
               sizeof(serv_addr)) < 0) 
               error("ERROR on binding");
-     listen(sockfd,5);
-     
+    	 
+	
+     	listen(sockfd,5);
 	clilen = sizeof(cli_addr);
-     
 
-	while (1) {
+while (1) {
+
+	printf("~While loop~\n");        
 
 	 int newsockfd = accept(sockfd, 
                (struct sockaddr *) &cli_addr, &clilen);
+	printf("newsockfd: %d\n", newsockfd);
          
 	if (newsockfd < 0) 
              error("ERROR on accept");
-	printf("connection successful\n");
-
-	char buffer[1024];
-	read(newsockfd, buffer, 255);
-	printf("Msg from client: %s\n", buffer);
-	/*
+        
 	pthread_t *server = malloc(sizeof(pthread_t));
-	int ret = pthread_create(server, NULL, Server_Thread, NULL);
-	
-	if(ret == 0){
+	int ret = pthread_create(server, NULL, Server_Thread, &newsockfd);
 
-	printf("Created new thread %u\n", pthread_self());
-	}
-	*/
+	if(ret < 0)
+		error("Error making new thread");
 
-	///Create individual processes
-	 /*pid = fork();
-         if (pid < 0)
-             error("ERROR on fork");
-         if (pid == 0)  {
-             close(sockfd);
-             dostuff(newsockfd);
-             exit(0);
-         }
+}
+	/*bzero(buffer, 256);
 
-        else close(newsockfd);*/
-
-     } 
-	
-
+	n = write(sockfd,buffer, strlen(buffer));
+	if(n < 0){
+		error("Sending error");
+		exit(1);
+	}*/
 
 /* end of while */
+
 
 
 
@@ -95,41 +103,20 @@ int main(int argc, char *argv[]){
 	char* filepath;
 
 
-	if(argc != 5){
-		printf("Invalid argument number: serverSNFS takes 5 arguments\n" );
-		return 0;
-	}else{
-		if(!strcmp(argv[1], "-port"))
-			port = atoi(argv[2]);
-		else{
-			printf("Wrong argument formatting!\n");
-			return 0;
-		}
-		if(!strcmp(argv[3], "-mount")){
-			filepath = argv[4];
-			int status;
-			status = mkdir(filepath,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-			if(status){
-				if(errno == EEXIST)
-					error("directory already in use");
-				else
-					error("Some error occurs in directory creation");
-			}
-			
-		}
-		else{
-			printf("Wrong argument formatting!\n");
-			return 0;
-		}
+	if(argc != 3){
+		printf("Invalid argument number: serverSNFS takes 2 arguments\n		TCP Port Number, filepath\n" );
 
+	}else{
+		port = atoi(argv[1]);
+		filepath = argv[2];
 	}
 
-	printf("Port: %d, Filepath: %s\n", port, filepath);	
+	printf("Port: %d, Filepath: %s", port, filepath);
 	//DO some error handling
 
 	acceptConnections(port);
 
-	printf("ServerSNFS\n");
+	//printf("ServerSNFS\n");
 
 	return 0;
 }

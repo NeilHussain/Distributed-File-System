@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <strings.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
-#include <string.h>
+#include <strings.h>
+
 #include "clientSNFS.h"
 
 #define h_addr h_addr_list[0] /* for backward compatibility */
@@ -56,11 +58,32 @@ void setServer(char* serverIdent, int port){
 	//attempts to the connect
 	if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
         error("ERROR connecting");
-	
-	char* buffer;
-	buffer = "Hi!!!!";
-	write(sockfd, buffer, strlen(buffer));
+
+	char *buffer;
+	//bzero(buffer, 256);
+
+	buffer = "helloworld";
+	//strcpy(buffer, "hello world!");
+
+	printf("Buffer Client: %s", buffer);
+	int n = write(sockfd,buffer,strlen(buffer));
+	if(n < 0){
+		error("Sending error");
+		exit(1);
+	}
+
 }
+
+void testCommand(char* string){
+
+
+
+
+
+
+
+}
+
 
 //Tries to open the file (can fail)
 //returns file descriptor if successful, -1 if failure
