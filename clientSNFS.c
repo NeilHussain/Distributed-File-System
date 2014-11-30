@@ -8,6 +8,8 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <strings.h>
+#include <time.h>
+#include <sys/stat.h>
 #include "clientSNFS.h"
 #define h_addr h_addr_list[0] /* for backward compatibility */
 
@@ -59,10 +61,10 @@ void setServer(char* serverIdent, int port){
 	if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
         error("ERROR connecting");
 
-	char *buffer;
+	//char *buffer;
 	//bzero(buffer, 256);
 
-	buffer = "ohelloworld.txt";
+	/*buffer = "ohelloworld.txt";
 	//strcpy(buffer, "hello world!");
 
 	printf("Buffer Client: %s", buffer);
@@ -70,39 +72,33 @@ void setServer(char* serverIdent, int port){
 	if(n < 0){
 		error("Sending error");
 		exit(1);
-	}
+	}*/
 
 	
 
 }
-
-void testCommand(char* string){
-
-
-
-
-
-
-
-}
-
 
 //Tries to open the file (can fail)
 //returns file descriptor if successful, -1 if failure
 int openFile(char *name){
 	
-	char *buffer = "";
+	char buffer[256];
+	bzero(buffer, 256);
+	//strcpy(buffer, "o");
 	buffer[0] = 'o';
-	buffer = strcat(buffer, name);
-	printf("ClientSNFS: %s", buffer);
-	int n = write(sockfd,buffer,strlen(buffer));
+	strcat(buffer, name);
+	
+	//printf("ClientSNFS: %s", buffer);
+	printf("Socket FD in clientSNFS: %d\n",sockfd);
+	int n = write(sockfd,buffer,(strlen(buffer)));
 		
 	if(n < 0){
 		error("Sending error in openFile");
 		exit(1);
 	}
 
-	n = read(sockfd, buffer, strlen(buffer));
+	usleep(1000);
+	n = read(sockfd, buffer, 255);
 	
 	if(n < 0){
 		error("Reading error openFile");
@@ -148,6 +144,23 @@ int statFile(int fd, struct fileStat *buf){
 		error("Sending error in statFile");
 		exit(1);
 	}
+	
+	n = read(sockfd , buf, sizeof(struct fileStat));
+	
+    if(n < 0){
+		error("Reading fileStat error");
+	}
+	
+	printf("filesize is %Zu\n", buf->file_size);
+					char atime[30], mtime[30];
+					struct tm* timeinfo;
+					timeinfo = localtime(&(buf->access_time));
+					strftime(atime, 30, "%b %d %H:%M", timeinfo);
+					printf("access time: %s\n", atime);
+    
+					timeinfo = localtime(&(buf->mod_time));
+					strftime(mtime, 30, "%b %d %H:%M", timeinfo);
+					printf("modi time: %s\n", mtime);
 return 0;
 }
 

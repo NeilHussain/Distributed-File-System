@@ -10,7 +10,6 @@
 
 struct fileStat{
 size_t file_size;
-time_t create_time;
 time_t access_time;
 time_t mod_time;
 };

@@ -42,16 +42,14 @@ char * getline(void) {
 
 void OpenSocket(char* ip, int port){
 
-setServer(ip, port);
-
-
-
+	setServer(ip, port);
 }
 
-void OpenFile(char* filename){
+void  OpenFile(char* filename){
 
-	printf("File: %s\n", filename);
-
+	//int fd = 100;
+	int fd = openFile(filename);
+	printf("File: %s FD: %d\n", filename, fd);
 }
 void ReadFile(char* filename){
 
@@ -73,7 +71,7 @@ void CloseFile(char* filename){
 
 void StatFile(char* filename){
 	struct fileStat* buf;
-	statFile(1, buf);
+	statFile(6, buf);
 }
 void getCommands(){
 
@@ -88,27 +86,29 @@ int running = 1;
 		//printf("%s", input);
 		char* file = "";
 			
-		if(strcmp(input, "open\n") ==0){
+		if(strcmp(input, "open\n") == 0){
 			printf("\nWhat file would you like to open?\n");
 			file = getline();
 
 			//strip the new line char
-			file[strlen(file)-1] =0;
+			file[strlen(file)-1] = 0;
 			OpenFile(file);
 		
-		}else if(strcmp(input, "read\n") ==0){
+		}else if(strcmp(input, "read\n") == 0){
+			
 			printf("\nWhat file would you like to read?\n");
 			file = getline();
 			file[strlen(file)-1] =0;
 			ReadFile(file);
 
-		}else if(strcmp(input, "write\n") ==0){
+		}else if(strcmp(input, "write\n") == 0){
 			
-		}else if(strcmp(input, "close\n") ==0){
+		}else if(strcmp(input, "close\n") == 0){
 			printf("\nWhat file would you like to close?\n");
 			file = getline();
 			file[strlen(file)-1] =0;
 			CloseFile(file);
+		
 		}else if(strcmp(input, "exit\n") ==0){
 
 			puts("Exiting...");
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]){
 	}
 	
 
-	OpenFile(filename);
+	//OpenFile(filename);
 	OpenSocket(IP,port);
 	
 	getCommands();
