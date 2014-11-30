@@ -250,7 +250,7 @@ int main(int argc, char *argv[]){
 				if(filepath[strlen(filepath)-1] != '/'){
 					filepath[strlen(filepath)] = '/';
 					filepath[strlen(filepath)+1] = '\0';
-				}
+				
 					
 			
 				
@@ -258,10 +258,11 @@ int main(int argc, char *argv[]){
 
 				//printf("basepath: %s\n", baseFilepath);
 				//Don't need an error here, just use that path when making/reading files
-				/*if(errno == EEXIST)
+				if(errno == EEXIST)
 					error("directory already in use");
 				else
-					error("Some error occurs in directory creation");*/
+					error("Some error occurs in directory creation");
+}
 			}
 			
 		}
