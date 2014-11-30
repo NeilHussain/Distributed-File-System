@@ -78,15 +78,17 @@ int socketNum = *socket;
 
 	char buffer[1024];
 	//bzero(buffer, 256);
-
-	int n = read(*socket ,buffer, 255);
 	
+	//this is actually useless now, only for initial testing of socket.
+	int n = read(*socket ,buffer, 255);
+	bzero(buffer, 256);		
+
 	if(n < 0){
 		error("Sending error");
 		exit(1);
 	}
 
-	//printf("Buffer: %s\n", buffer);
+//	printf("Buffer: %s\n", buffer);
 
 	while(1){
 		//printf("Running: %d\n\n", socketNum);
@@ -119,7 +121,7 @@ int socketNum = *socket;
 					
 				   filename = strcat(baseFilepath, filename);
 
-				  // printf("File path: %s\n", filename);
+				 // printf("File path: %s\n", filename);
 				   openFile(filename);				
 				   bzero(buffer, 256);
 				}
@@ -129,11 +131,29 @@ int socketNum = *socket;
 			case 'c':
 				break;
 			case 's':
-				printf("Howdy from %d\n\n", socketNum);
-					
+				{
+				int fd = atoi(&buffer[1]);
+				printf("%d\n", fd);			
 
-				bzero(buffer, 256);				
+				struct stat st;
+
+				if(fstat(fd, &st) == 0){
+					printf("filesize is %Zu\n", st.st_size);
+					char atime[30], mtime[30];
+
+					struct tm* timeinfo;
+					timeinfo = localtime(&(info.st_atime));
+					strftime(atime, 30, "%b %d %H:%M", timeinfo);
+					printf("access time: %s\n", atime);
+
+					timeinfo = localtme(&(info.st_mtime));
+					strftime(mtime, 30, "%b %d %H:%M", timeinfo);
+					printf("modi time: %s\n", mtime);
+}
+				bzero(buffer, 256);							 
+				}
 				break;
+				
 			default:
 				//printf("Got some message: %c on socket: %d\n", buffer[0], socketNum);
 				bzero(buffer, 256);
@@ -224,13 +244,12 @@ int main(int argc, char *argv[]){
 			
 			if(status){
 
-				baseFilepath = filepath;
-				//Don't need an error here, just use that path when making/reading files
-				/*if(errno == EEXIST)
+				if (errno == EEXIST)
 					error("directory already in use");
 				else
-					error("Some error occurs in directory creation");*/
+					error("Some error occurs in directory creation");
 			}
+				baseFilepath = filepath;
 			
 		}
 		else{

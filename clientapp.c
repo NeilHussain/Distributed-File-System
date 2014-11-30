@@ -71,6 +71,10 @@ void CloseFile(char* filename){
 
 }
 
+void StatFile(char* filename){
+	struct fileStat* buf;
+	statFile(1, buf);
+}
 void getCommands(){
 
 
@@ -109,7 +113,12 @@ int running = 1;
 
 			puts("Exiting...");
 			exit(1);
-		}		
+		}else if(strcmp(input, "stat\n") ==0){
+			printf("\nWhat file would you like to check for its stat?\n");
+			file = getline();
+			file[strlen(file)-1] =0;
+			StatFile(file);
+		}
 
 
 	}

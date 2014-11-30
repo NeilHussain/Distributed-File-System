@@ -136,8 +136,18 @@ return -1;
 //Returns info about the file
 int statFile(int fd, struct fileStat *buf){
 
-
-
+	char buffer[50] = "";
+	strcat(buffer, "s");
+	char str[50] = "";
+	sprintf(str, "%d", fd);
+	strcat(buffer, str);
+	printf("%s\n", buffer);	
+	int n = write(sockfd, buffer, strlen(buffer));
+	
+	if(n < 0){
+		error("Sending error in statFile");
+		exit(1);
+	}
 return 0;
 }
 
