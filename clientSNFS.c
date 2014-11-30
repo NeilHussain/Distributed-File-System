@@ -96,8 +96,23 @@ int openFile(char *name){
 	buffer = strcat(buffer, name);
 	printf("ClientSNFS: %s", buffer);
 	int n = write(sockfd,buffer,strlen(buffer));
+		
+	if(n < 0){
+		error("Sending error in openFile");
+		exit(1);
+	}
 
-return n;
+	n = read(sockfd, buffer, strlen(buffer));
+	
+	if(n < 0){
+		error("Reading error openFile");
+		exit(1);
+	}
+	
+	int fd = atoi(buffer);
+	
+
+return fd;
 }
 
 //Attempts to read entire file

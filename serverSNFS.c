@@ -12,26 +12,34 @@
 #include <pthread.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <time.h>
 
 char* baseFilepath;
+int fdNumber = 100;
 
 struct permission{
 
-int threadID;
-
+//int threadID;
+FILE filePTR;
 int read;
 int write;
 
 struct permission* nextPerm;
 
 };
-
 typedef struct permission* permPtr;
 
 void error(char *msg){
 
     perror(msg);
     exit(1);
+}
+
+int getNextFD(){
+
+srand(time(NULL));
+return (fdNumber += rand());
+
 }
 
 int readFile(){
@@ -44,6 +52,8 @@ int openFile(char* name){
 
 FILE *fp;
 fp = fopen(name, "rw");
+
+//give this file some value and send it back, store it in the LL
 
 
 
