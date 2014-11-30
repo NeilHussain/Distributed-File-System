@@ -105,6 +105,7 @@ int openFile(char *name){
 	
 	int fd = atoi(buffer);
 	
+	
 
 return fd;
 }

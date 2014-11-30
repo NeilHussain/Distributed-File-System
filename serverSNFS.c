@@ -53,12 +53,10 @@ int openFile(char* name){
 
 
 printf("OpenFile in server: %s\n", name);
-int fd = open(name, O_WRONLY);
+int fd = open(name, O_RDWR | O_CREAT, 0644);
 
 
 //give this file some value and send it back, store it in the LL
-
-
 
 return fd;
 
@@ -98,7 +96,7 @@ int socketNum = *socket;
 		//buffer[0] = 
 		   //r = read, o = open, w = write, c = close s = statFile		
 	
-		printf("Buffer in server: %s\n", buffer);
+		//printf("Buffer in server: %s\n", buffer);
 		if(n < 0){
 			error("Sending error");
 			exit(1);
@@ -124,11 +122,15 @@ int socketNum = *socket;
 				   int length = strlen(buffer);
   				   char* filename = malloc(sizeof(char)* (length-1 + strlen(baseFilepath)));
 				   parseFilename(filename, buffer, length);
-				   //printf("Filename: %s\n", filename);
+				   printf("Filename: %s\n", filename);
 					
-				   filename = strcat(baseFilepath, filename);
+					char* temp = malloc(strlen(baseFilepath) + strlen(filename));
+					strcpy(temp, baseFilepath);
+	
+				   strcat(temp, filename);
+					filename = temp;
 
-				  // printf("File path: %s\n", filename);
+				   printf("File path: %s\n", filename);
 				   int fd = openFile(filename);				
 				   bzero(buffer, 256);
 				   sprintf(buffer, "%d", fd);
@@ -223,8 +225,8 @@ while (1) {
 
 int main(int argc, char *argv[]){
 	int port;
-	char* filepath;
-
+	char filepath[128];
+	bzero(filepath, 128);
 
 	
  
@@ -239,13 +241,22 @@ int main(int argc, char *argv[]){
 			return 0;
 		}
 		if(!strcmp(argv[3], "-mount")){
-			filepath = argv[4];
+			strcpy(filepath, argv[4]);
 			int status;
 			status = mkdir(filepath,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 			
 			if(status){
 
+				if(filepath[strlen(filepath)-1] != '/'){
+					filepath[strlen(filepath)] = '/';
+					filepath[strlen(filepath)+1] = '\0';
+				}
+					
+			
+				
 				baseFilepath = filepath;
+
+				//printf("basepath: %s\n", baseFilepath);
 				//Don't need an error here, just use that path when making/reading files
 				/*if(errno == EEXIST)
 					error("directory already in use");
