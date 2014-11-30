@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <fcntl.h>
 
 char* baseFilepath;
 int fdNumber = 100;
@@ -50,21 +51,23 @@ return 1;
 
 int openFile(char* name){
 
-FILE *fp;
-fp = fopen(name, "rw");
+
+printf("OpenFile in server: %s\n", name);
+int fd = open(name, O_WRONLY);
+
 
 //give this file some value and send it back, store it in the LL
 
 
 
-return 1;
+return fd;
 
 }
 
-char* parseFilename(char* buffer){
+char* parseFilename(char* filename, char* buffer, int length){
 
-  int length = strlen(buffer);
-  char* filename = malloc(sizeof(char)* (length-1));
+  //int length = strlen(buffer);
+  //char* filename = malloc(sizeof(char)* (length-1));
   strncpy(filename, buffer+1, length);
 
 return filename;
@@ -77,24 +80,25 @@ int* socket = (int*) socket_ptr;
 int socketNum = *socket;
 
 	char buffer[1024];
-	//bzero(buffer, 256);
+	bzero(buffer, 1024);
 
-	int n = read(*socket ,buffer, 255);
+	/*int n = read(socketNum ,buffer, 255);
 	
 	if(n < 0){
 		error("Sending error");
 		exit(1);
-	}
+	}*/
 
 	//printf("Buffer: %s\n", buffer);
 
 	while(1){
 		//printf("Running: %d\n\n", socketNum);
 	
-		int n = read(*socket ,buffer, 255);
+		int n = read(*socket ,buffer, 1023);
 		//buffer[0] = 
 		   //r = read, o = open, w = write, c = close s = statFile		
 	
+		printf("Buffer in server: %s\n", buffer);
 		if(n < 0){
 			error("Sending error");
 			exit(1);
@@ -102,7 +106,7 @@ int socketNum = *socket;
 
 		switch (buffer[0]){
 			case 'h':
-				printf("Buffer: %s, Length: %d",buffer, (int)strlen(buffer));
+				printf("Buffer: %s, Length: %d\n",buffer, (int)strlen(buffer));
 							
 				bzero(buffer, 256);
 			break;
@@ -114,14 +118,30 @@ int socketNum = *socket;
 				//char filename; 
 				//const char filename = malloc(sizeof(char)* (strlen(buffer) -1));
 				{
-				   char* filename = parseFilename(buffer);
+					
+				   //char* filename = parseFilename(buffer);
+
+				   int length = strlen(buffer);
+  				   char* filename = malloc(sizeof(char)* (length-1 + strlen(baseFilepath)));
+				   parseFilename(filename, buffer, length);
 				   //printf("Filename: %s\n", filename);
 					
 				   filename = strcat(baseFilepath, filename);
 
 				  // printf("File path: %s\n", filename);
-				   openFile(filename);				
+				   int fd = openFile(filename);				
 				   bzero(buffer, 256);
+				   sprintf(buffer, "%d", fd);
+				   
+					printf("Writing Buffer: %s\n", buffer);
+					int n = write(socketNum ,buffer, 255);
+					if(n < 0){
+					//error
+					}
+
+					bzero(buffer, 256);
+				  //free(filename);
+					
 				}
 				break;
 			case 'w':
@@ -137,6 +157,7 @@ int socketNum = *socket;
 			default:
 				//printf("Got some message: %c on socket: %d\n", buffer[0], socketNum);
 				bzero(buffer, 256);
+				//puts("Hit default");				
 				usleep(100);
 			
 				break;
@@ -144,7 +165,7 @@ int socketNum = *socket;
 		
 	}
 
-close(*socket);
+	close(*socket);
 
 return NULL;
 }
