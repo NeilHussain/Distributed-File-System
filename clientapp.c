@@ -51,10 +51,20 @@ void  OpenFile(char* filename){
 	int fd = openFile(filename);
 	printf("File: %s FD: %d\n", filename, fd);
 }
-void ReadFile(char* filename){
+void ReadFile(int fd){
 
 	//need to get file descripter from filename or something like that
-	printf("File: %s\n", filename);
+	printf("File: %d\n", fd);
+	char buff[1024];
+	bzero(buff, 1024);	
+
+	int ret = readFile(fd ,buff);
+	if(ret >= 0){
+		printf("%s", buff);
+	}else{
+		printf("Readfile failure return value: %d", ret);
+
+	}
 
 }
 void WriteFile(char* filename){
@@ -72,7 +82,7 @@ void CloseFile(int fd){
 }
 
 void StatFile(char* filename){
-	struct fileStat* buf;
+	struct fileStat* buf =NULL;
 	statFile(6, buf);
 }
 void getCommands(){
@@ -98,10 +108,11 @@ int running = 1;
 		
 		}else if(strcmp(input, "read\n") == 0){
 			
-			printf("\nWhat file would you like to read?\n");
-			file = getline();
-			file[strlen(file)-1] =0;
-			ReadFile(file);
+			printf("\nWhat file would you like to read? (File Descriptor)\n");
+			fd = getline();
+			fd[strlen(fd)-1] =0;
+			int fdNum = atoi(fd);
+			ReadFile(fdNum);
 
 		}else if(strcmp(input, "write\n") == 0){
 			
@@ -110,7 +121,7 @@ int running = 1;
 			printf("\nWhat file would you like to close? (File Descriptor)\n");
 			fd = getline();
 			
-			fd[strlen(file)-1] = 0;
+			fd[strlen(fd)-1] = 0;
 			int fdNum = atoi(fd);
 			CloseFile(fdNum);
 		
@@ -122,6 +133,7 @@ int running = 1;
 			printf("\nWhat file would you like to check for its stat?\n");
 			file = getline();
 			file[strlen(file)-1] =0;
+						
 			StatFile(file);
 		}
 

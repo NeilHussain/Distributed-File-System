@@ -44,24 +44,29 @@ void error(char *msg){
 
 int getNextFD(){
 
-srand(time(NULL));
-return (fdNumber += rand());
+	srand(time(NULL));
+	return (fdNumber += rand());
 
 }
 
-int readFile(){
+int readFile(int fd, void* buffer){
 
+	int numBytes = 0;
 
-return 1;
+	read(fd, buffer, numBytes);
+
+	printf("Buffer in readfile: %s\n", buffer);
+	return numBytes;
 }
+
+
 int closeFile(int fd){
 
-return (close(fd));
-
-
-
+	return (close(fd));
 
 }
+
+
 int openFile(char* name){
 
 
@@ -122,8 +127,19 @@ int socketNum = *socket;
 				bzero(buffer, 256);
 			break;
 			case 'r':
-				readFile();
+			{
+				int fd = atoi(buffer+1);
+				
+				char* fileContents = malloc(sizeof(char) * 1024);
+				readFile(fd, fileContents);
+				
+				int n = write(socketNum ,fileContents, 1024);
+
+				if(n < 0){
+					//error
+				}
 				bzero(buffer, 256);
+			}				
 				break;
 			case 'o':
 				//char filename; 
@@ -311,7 +327,7 @@ int main(int argc, char *argv[]){
 			
 			if(status){
 
-<<<<<<< HEAD
+
 					if(errno == EEXIST)
 					error("directory already in use");
 				else
@@ -330,28 +346,8 @@ int main(int argc, char *argv[]){
 			}
 				//printf("basepath: %s\n", baseFilepath);
 				//Don't need an error here, just use that path when making/reading files
-				
-=======
-				
+			
 
-				//printf("basepath: %s\n", baseFilepath);
-				//Don't need an error here, just use that path when making/reading files
-				if(errno == EEXIST)
-					error("directory already in use");
-				else
-					error("Some error occurs in directory creation");
-			}
->>>>>>> c273bf42e40ced1cefe7d5d4d4b2e8766cf0612b
-			
-			if(filepath[strlen(filepath)-1] != '/'){
-					filepath[strlen(filepath)] = '/';
-					filepath[strlen(filepath)+1] = '\0';
-				
-					
-			
-				
-				baseFilepath = filepath;
-				}
 			
 		}else{
 			printf("Wrong argument formatting!\n");

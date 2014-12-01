@@ -113,12 +113,28 @@ return fd;
 }
 
 //Attempts to read entire file
-//Returns number of byte reaad, -1 otherwise
+//Returns number of byte read, -1 otherwise
 int readFile(int fd, void *buf){
 
+	char buffer[1024] = "";
+	strcat(buffer, "r");
+	
+	char str[] = "";
+	sprintf(str, "%d", fd);
+	strcat(buffer, str);
+
+	//printf("%s\n", buffer);	
+	
+	int n = write(sockfd, buffer, strlen(buffer));
+	
+	usleep(1000);
+
+	n = read(sockfd, buffer, strlen(buffer));
+
+	
 
 
-return -1;
+return n;
 }
 
 //Writes the the entire buffer

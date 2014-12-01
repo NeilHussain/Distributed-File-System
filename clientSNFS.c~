@@ -8,6 +8,8 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <strings.h>
+#include <time.h>
+#include <sys/stat.h>
 #include "clientSNFS.h"
 #define h_addr h_addr_list[0] /* for backward compatibility */
 
@@ -111,12 +113,28 @@ return fd;
 }
 
 //Attempts to read entire file
-//Returns number of byte reaad, -1 otherwise
+//Returns number of byte read, -1 otherwise
 int readFile(int fd, void *buf){
 
+	char buffer[1024] = "";
+	strcat(buffer, "r");
+	
+	char str[] = "";
+	sprintf(str, "%d", fd);
+	strcat(buffer, str);
+
+	//printf("%s\n", buffer);	
+	
+	int n = write(sockfd, buffer, strlen(buffer));
+	
+	usleep(1000);
+
+	n = read(sockfd, buffer, strlen(buffer));
+
+	
 
 
-return -1;
+return n;
 }
 
 //Writes the the entire buffer
@@ -131,8 +149,35 @@ return -1;
 //Returns info about the file
 int statFile(int fd, struct fileStat *buf){
 
-
-
+	char buffer[50] = "";
+	strcat(buffer, "s");
+	char str[50] = "";
+	sprintf(str, "%d", fd);
+	strcat(buffer, str);
+	printf("%s\n", buffer);	
+	int n = write(sockfd, buffer, strlen(buffer));
+	
+	if(n < 0){
+		error("Sending error in statFile");
+		exit(1);
+	}
+	
+	n = read(sockfd , buf, sizeof(struct fileStat));
+	
+    if(n < 0){
+		error("Reading fileStat error");
+	}
+	
+	printf("filesize is %Zu\n", buf->file_size);
+					char atime[30], mtime[30];
+					struct tm* timeinfo;
+					timeinfo = localtime(&(buf->access_time));
+					strftime(atime, 30, "%b %d %H:%M", timeinfo);
+					printf("access time: %s\n", atime);
+    
+					timeinfo = localtime(&(buf->mod_time));
+					strftime(mtime, 30, "%b %d %H:%M", timeinfo);
+					printf("modi time: %s\n", mtime);
 return 0;
 }
 

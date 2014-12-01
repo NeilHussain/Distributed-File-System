@@ -44,24 +44,29 @@ void error(char *msg){
 
 int getNextFD(){
 
-srand(time(NULL));
-return (fdNumber += rand());
+	srand(time(NULL));
+	return (fdNumber += rand());
 
 }
 
-int readFile(){
+int readFile(int fd, void* buffer){
 
+	int numBytes = 0;
 
-return 1;
+	read(fd, buffer, numBytes);
+
+	printf("Buffer in readfile: %s\n", buffer);
+	return numBytes;
 }
+
+
 int closeFile(int fd){
 
-return (close(fd));
-
-
-
+	return (close(fd));
 
 }
+
+
 int openFile(char* name){
 
 
@@ -122,8 +127,19 @@ int socketNum = *socket;
 				bzero(buffer, 256);
 			break;
 			case 'r':
-				readFile();
+			{
+				int fd = atoi(buffer+1);
+				
+				char* fileContents = malloc(sizeof(char) * 1024);
+				readFile(fd, fileContents);
+				
+				int n = write(socketNum ,fileContents, 1024);
+
+				if(n < 0){
+					//error
+				}
 				bzero(buffer, 256);
+			}				
 				break;
 			case 'o':
 				//char filename; 
