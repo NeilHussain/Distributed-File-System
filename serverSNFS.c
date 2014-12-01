@@ -66,9 +66,6 @@ int closeFile(int fd){
 
 return (close(fd));
 
-
-
-
 }
 int openFile(char* name){
 
