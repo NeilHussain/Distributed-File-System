@@ -79,7 +79,7 @@ void getCommands(){
 int running = 1;
 	while(running){
 
-		printf("\nWhat would you like to do? Type:\n   'open' to open a file\n   'read' to read a file\n   'write' to write to a file\n   'close' to close a file\n   'exit' to exit the program\n");
+		printf("\nWhat would you like to do? Type:\n   'open' to open a file\n   'read' to read a file\n   'write' to write to a file\n   'stat' to check file stat\n   'close' to close a file\n   'exit' to exit the program\n");
 		char* input = "";
 		input = getline();
 		
