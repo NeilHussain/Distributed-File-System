@@ -125,6 +125,7 @@ char* parseFilename(char* filename, char* buffer, int length){
 return filename;
 }
 
+	
 
 void* Server_Thread(void* socket_ptr){
 
@@ -216,7 +217,23 @@ int socketNum = *socket;
 					
 				}
 				break;
-			case 'w':
+			case 'w':{
+				int fd = atoi(&buffer[1]);
+				bzero(buffer, 1024);
+				
+				n = read(socketNum, buffer, sizeof(buffer));
+				
+				ssize_t ret = write(fd, buffer, strlen(buffer));
+				bzero(buffer, 1024);
+				sprintf(buffer, "%zd", ret);
+				
+				n = write(socketNum, buffer, 1024);
+
+				if(n < 0)
+					error("Writting error");
+				bzero(buffer, 1024);	
+
+				}
 				break;
 			case 'c':
 				{
