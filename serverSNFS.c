@@ -48,7 +48,14 @@ int readFile(){
 
 return 1;
 }
+int closeFile(int fd){
 
+return (close(fd));
+
+
+
+
+}
 int openFile(char* name){
 
 
@@ -96,7 +103,7 @@ int socketNum = *socket;
 		//buffer[0] = 
 		   //r = read, o = open, w = write, c = close s = statFile		
 	
-		//printf("Buffer in server: %s\n", buffer);
+		printf("Buffer in server: %s\n", buffer);
 		if(n < 0){
 			error("Sending error");
 			exit(1);
@@ -149,7 +156,27 @@ int socketNum = *socket;
 			case 'w':
 				break;
 			case 'c':
-				break;
+				{
+				   int fd = atoi(buffer+1);
+				   printf("Fd is c block: %d", fd);
+					
+			
+			     	   bzero(buffer, 256);
+				   sprintf(buffer, "%d", closeFile(fd));
+				   
+					
+				   printf("Writing Buffer: %s\n", buffer);
+			  	   int n = write(socketNum ,buffer, 255);
+					if(n < 0){
+					   //error
+					}
+
+					bzero(buffer, 256);
+
+				puts("Got to close file");
+				
+				}
+					break;
 			case 's':
 				printf("Howdy from %d\n\n", socketNum);
 					
@@ -247,6 +274,13 @@ int main(int argc, char *argv[]){
 			
 			if(status){
 
+					if(errno == EEXIST)
+					error("directory already in use");
+				else
+					error("Some error occurs in directory creation");
+				}
+			
+
 				if(filepath[strlen(filepath)-1] != '/'){
 					filepath[strlen(filepath)] = '/';
 					filepath[strlen(filepath)+1] = '\0';
@@ -255,15 +289,10 @@ int main(int argc, char *argv[]){
 			
 				
 				baseFilepath = filepath;
-
+			}
 				//printf("basepath: %s\n", baseFilepath);
 				//Don't need an error here, just use that path when making/reading files
-				if(errno == EEXIST)
-					error("directory already in use");
-				else
-					error("Some error occurs in directory creation");
-}
-			}
+				
 			
 		}
 		else{

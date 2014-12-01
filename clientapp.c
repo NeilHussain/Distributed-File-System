@@ -64,14 +64,15 @@ void WriteFile(char* filename){
 	printf("File: %s\n", filename);
 
 }
-void CloseFile(char* filename){
+void CloseFile(int fd){
 
-	printf("File: %s\n", filename);
+	int ret = closeFile(fd);
+	printf("Closing file: %d Return Value: %d\n", fd, ret);
+	
 
 }
 
 void getCommands(){
-
 
 int running = 1;
 	while(running){
@@ -82,6 +83,7 @@ int running = 1;
 		
 		//printf("%s", input);
 		char* file = "";
+		char* fd = "";
 			
 		if(strcmp(input, "open\n") == 0){
 			printf("\nWhat file would you like to open?\n");
@@ -101,10 +103,13 @@ int running = 1;
 		}else if(strcmp(input, "write\n") == 0){
 			
 		}else if(strcmp(input, "close\n") == 0){
-			printf("\nWhat file would you like to close?\n");
-			file = getline();
-			file[strlen(file)-1] =0;
-			CloseFile(file);
+			
+			printf("\nWhat file would you like to close? (File Descriptor)\n");
+			fd = getline();
+			
+			fd[strlen(file)-1] = 0;
+			int fdNum = atoi(fd);
+			CloseFile(fdNum);
 		
 		}else if(strcmp(input, "exit\n") ==0){
 

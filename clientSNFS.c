@@ -139,9 +139,31 @@ return 0;
 //Closes the given file, should fail on illegal operations
 int closeFile(int fd){
 
+char buffer[256];
+char temp[256];
+	bzero(buffer, 256);
+	//strcpy(buffer, "o");
+	buffer[0] = 'c';
+	sprintf(temp, "%d", fd);
+	strcat(buffer, temp);
+	int n = write(sockfd,buffer,(strlen(buffer)));
+		
+	if(n < 0){
+		error("Sending error in closeFile");
+		exit(1);
+	}
 
+	usleep(1000);
+	n = read(sockfd, buffer, 255);
+	
+	if(n < 0){
+		error("Reading error closeFile");
+		exit(1);
+	}
+	
+	int ret = atoi(buffer);
 
-return 0;
+return ret;
 }
 
 
