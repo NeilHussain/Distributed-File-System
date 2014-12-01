@@ -128,16 +128,18 @@ int readFile(int fd, void *buf){
 	
 	int n = write(sockfd, buffer, strlen(buffer));
 	
-	usleep(1000);
+	bzero(buffer, 1024);
 
-	n = read(sockfd, buffer, strlen(buffer));
+	n = read(sockfd, buffer, 1024);
+	if(n < 0)
+		error("Reading error in readFile");
+		
+	if(strcmp("-1", buffer) == 0)
+	    return -1;
 	
-	strcpy(buf, buffer);
-	
-
-
-return n;
-
+	printf("what's returned: %s\n", buffer);
+    buf = buffer;
+    return strlen(buf);
 }
 
 //Writes the the entire buffer

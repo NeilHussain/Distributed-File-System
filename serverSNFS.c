@@ -63,7 +63,7 @@ int readFile(int fd, void* buffer){
 
 	read(fd, buffer, numBytes);
 
-	printf("Buffer in readfile: %s\n", buffer);
+	printf("Buffer in readfile: %s\n", (char*)buffer);
 	return numBytes;
 }
 
@@ -168,18 +168,24 @@ int socketNum = *socket;
 				int fd = atoi(buffer+1);
 				
 				//char* fileContents = malloc(sizeof(char) * 1024);
-				char* fileContents = "";
-				int numBytes = 0;
-
-				read(fd, fileContents, numBytes);
-				printf("fileContents: %s", fileContents);				
-
+				char fileContents[1024];
+				bzero(fileContents, 1024);
+				
+				ssize_t ret = read(fd, fileContents, sizeof(fileContents));
+				/*
+				if(ret == -1){
+				    sprintf(fileContents, "%zd", ret);
+				}
+				*/
+				//printf("file contents: %s\n", fileContents);
+				printf("numbytes: %zd\n", ret);
+				write(1, fileContents, ret);
 				int n = write(socketNum ,fileContents, 1024);
 
 				if(n < 0){
 					//error
 				}
-				//bzero(buffer, 256);
+				bzero(fileContents, 1024);
 			}				
 				break;
 			case 'o':
@@ -266,17 +272,30 @@ int socketNum = *socket;
 
 				if(fstat(fd, &st) == 0){
 				    
-				    struct fileStat file1;
-				    file1.file_size = st.st_size;
-				    file1.access_time = st.st_atime;
-				    file1.mod_time = st.st_mtime;
+				    struct fileStat* file1 = (struct fileStat*)malloc(sizeof(struct fileStat));
+				    file1->file_size = st.st_size;
+				    file1->access_time = st.st_atime;
+				    file1->mod_time = st.st_mtime;
 				    struct creatTime* temp = head;
 				    for(; temp; temp = temp->nextTime){
 				    	if(temp->fd == fd){
-						strcpy(file1.ctime, temp->ctime);
+						strcpy(file1->ctime, temp->ctime);
 						break;
 						}
 				    }
+				    
+				    printf("filesize is %Zu\ncreation time: %s\n", file1->file_size, file1->ctime);
+					char atime[30], mtime[30];
+					struct tm* timeinfo;
+					timeinfo = localtime(&(file1->access_time));
+					strftime(atime, 30, "%b %d %H:%M", timeinfo);
+					printf("access time: %s\n", atime);
+    
+					timeinfo = localtime(&(file1->mod_time));
+					strftime(mtime, 30, "%b %d %H:%M", timeinfo);
+					printf("modi time: %s\n", mtime);
+					
+					
 				    int n = write(socketNum , &file1, sizeof(file1));
 					if(n < 0){
 					    error("error in sending fileStat");
