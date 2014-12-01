@@ -8,12 +8,6 @@
 #include <netdb.h> 
 #include <strings.h>
 
-struct fileMap{
-	char filename[30];
-	int fd;
-	struct fileMap* next;
-};
-struct fileMap* head;
 char * getline(void) {
     char * line = malloc(100), * linep = line;
     size_t lenmax = 100, len = lenmax;
@@ -56,23 +50,7 @@ void  OpenFile(char* filename){
 	//int fd = 100;
 	int fd = openFile(filename);
 	printf("File: %s FD: %d\n", filename, fd);
-	if(!head){
-		head = malloc(sizeof(struct fileMap));
-		strcpy(head->filename, filename);
-		printf("head is %s\n", head->filename);
-		head->fd = fd;
-	}else{
-		struct fileMap* temp;
-		temp = head;
-		if(temp){
-			while(temp->next)
-				temp = temp->next;
-		}
-		temp->next = malloc(sizeof(struct fileMap));
-		strcpy(temp->next->filename, filename);
-		printf("temp is %s\n", temp->filename);
-		temp->next->fd = fd;
-	}
+	
 }
 void ReadFile(int fd){
 
@@ -81,7 +59,7 @@ void ReadFile(int fd){
 	char* buff = malloc(sizeof(char)*1024);
 	bzero(buff, 1024);	
 
-	int ret = readFile(fd ,buff);
+	int ret = readFile(fd , buff);
 	if(ret >= 0){
 		printf("Read Response %s", buff);
 	}else{
@@ -90,10 +68,11 @@ void ReadFile(int fd){
 	}
 
 }
-void WriteFile(char* filename){
+void WriteFile(int fd){
 
 	//need to get file descripter from filename or something like that
-	printf("File: %s\n", filename);
+	int ret = writeFile(fd, "hello");
+	printf("bytes written: %d\n",  ret);
 
 }
 void CloseFile(int fd){
@@ -104,19 +83,14 @@ void CloseFile(int fd){
 
 }
 
-void StatFile(char* filename){
+void StatFile(int fd){
 
 	struct fileStat* buf = (struct fileStat*)malloc(sizeof(struct fileStat));
-	struct fileMap* temp = head;
-	for(; temp; temp = temp->next){
-		if(!strcmp(temp->filename, filename)){
-			printf("stat of %s, fd is %d\n", temp->filename, temp->fd);
-			statFile(temp->fd, buf);
-			break;
-		}
-	}
-	printf("\nfilesize is %Zu\n", buf->file_size);
-	printf("creation time: %s\n", buf->ctime);
+	
+	statFile(fd, buf);
+	                //printing the info for the file
+	                printf("\nfilesize is %Zu\n", buf->file_size);
+	                printf("creation time: %s\n", buf->ctime);
 					char atime[30], mtime[30];
 					struct tm* timeinfo;
 					timeinfo = localtime(&(buf->access_time));
@@ -157,7 +131,11 @@ int running = 1;
 			ReadFile(fdNum);
 
 		}else if(strcmp(input, "write\n") == 0){
-			
+			printf("\nWhat file would you like to write to? (File Descriptor)\n");
+			fd = getline();
+			fd[strlen(fd)-1] = 0;
+			int fdNum = atoi(fd);
+			WriteFile(fdNum);
 		}else if(strcmp(input, "close\n") == 0){
 			
 			printf("\nWhat file would you like to close? (File Descriptor)\n");
@@ -172,11 +150,11 @@ int running = 1;
 			puts("Exiting...");
 			exit(1);
 		}else if(strcmp(input, "stat\n") ==0){
-			printf("\nWhat file would you like to check for its stat?\n");
-			file = getline();
-			file[strlen(file)-1] =0;
-						
-			StatFile(file);
+			printf("\nWhat file would you like to check for its stat?(File Descriptor)\n");
+			fd = getline();
+			fd[strlen(file)-1] =0;
+			int fdNum = atoi(fd);			
+			StatFile(fdNum);
 		}
 
 

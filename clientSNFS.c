@@ -82,7 +82,7 @@ void setServer(char* serverIdent, int port){
 //Tries to open the file (can fail)
 //returns file descriptor if successful, -1 if failure
 int openFile(char *name){
-	
+
 	char buffer[256];
 	bzero(buffer, 256);
 	//strcpy(buffer, "o");
@@ -117,6 +117,10 @@ return fd;
 //Returns number of byte read, -1 otherwise
 int readFile(int fd, void *buf){
 
+	if(fd == 0){
+		return -1;
+	}
+
 	char buffer[1024] = "";
 	buffer[0] = 'r';
 	
@@ -129,21 +133,27 @@ int readFile(int fd, void *buf){
 	int n = write(sockfd, buffer, strlen(buffer));
 	
 	usleep(1000);
+	bzero(buffer, 1024);
 
-	n = read(sockfd, buffer, strlen(buffer));
+	n = read(sockfd, buffer, 1024);
+	if(n < 0)
+		error("Reading error in readFile");
+		
+	if(strcmp("-1", buffer) == 0)
+	    return -1;
 	
-	strcpy(buf, buffer);
-	
-
-
-return n;
-
+	printf("what's returned: %s\n", buffer);
+    strcpy(buf, buffer);
+    return strlen(buf);
 }
 
 //Writes the the entire buffer
 //Returns number of bytes written, -1 otherwise
 int writeFile(int fd, void *buf){
 
+	if(fd == 0){
+		return -1;
+	}
 	char buffer[256];
 	bzero(buffer, 256);
 	strcat(buffer, "w");
@@ -175,6 +185,9 @@ return ret;
 //Returns info about the file
 int statFile(int fd, struct fileStat *buf){
 
+	if(fd == 0){
+		return -1;
+	}
 	char buffer[50] = "";
 	strcat(buffer, "s");
 	char str[50] = "";
