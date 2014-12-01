@@ -8,6 +8,12 @@
 #include <netdb.h> 
 #include <strings.h>
 
+struct fileMap{
+	char filename[30];
+	int fd;
+	struct fileMap* next;
+};
+struct fileMap* head;
 char * getline(void) {
     char * line = malloc(100), * linep = line;
     size_t lenmax = 100, len = lenmax;
@@ -50,6 +56,23 @@ void  OpenFile(char* filename){
 	//int fd = 100;
 	int fd = openFile(filename);
 	printf("File: %s FD: %d\n", filename, fd);
+	if(!head){
+		head = malloc(sizeof(struct fileMap));
+		strcpy(head->filename, filename);
+		printf("head is %s\n", head->filename);
+		head->fd = fd;
+	}else{
+		struct fileMap* temp;
+		temp = head;
+		if(temp){
+			while(temp->next)
+				temp = temp->next;
+		}
+		temp->next = malloc(sizeof(struct fileMap));
+		strcpy(temp->next->filename, filename);
+		printf("temp is %s\n", temp->filename);
+		temp->next->fd = fd;
+	}
 }
 void ReadFile(char* filename){
 
@@ -70,8 +93,26 @@ void CloseFile(char* filename){
 }
 
 void StatFile(char* filename){
-	struct fileStat* buf;
-	statFile(6, buf);
+	struct fileStat* buf = (struct fileStat*)malloc(sizeof(struct fileStat));
+	struct fileMap* temp = head;
+	for(; temp; temp = temp->next){
+		if(!strcmp(temp->filename, filename)){
+			printf("stat of %s, fd is %d\n", temp->filename, temp->fd);
+			statFile(temp->fd, buf);
+			break;
+		}
+	}
+	printf("\nfilesize is %Zu\n", buf->file_size);
+	printf("creation time: %s\n", buf->ctime);
+					char atime[30], mtime[30];
+					struct tm* timeinfo;
+					timeinfo = localtime(&(buf->access_time));
+					strftime(atime, 30, "%b %d %H:%M", timeinfo);
+					printf("access time: %s\n", atime);
+    
+					timeinfo = localtime(&(buf->mod_time));
+					strftime(mtime, 30, "%b %d %H:%M", timeinfo);
+					printf("modi time: %s\n", mtime);
 }
 void getCommands(){
 
@@ -131,14 +172,13 @@ int main(int argc, char *argv[]){
 	//ARGS: IP PORT FILENAME
 	char* IP = "";
 	int port = 0;
-	char* filename;
 
-	if(argc != 4){
+	if(argc != 3){
+		printf("please provide two parameters! (IP, port)\n");
 		return 0;
 	}else{
 		IP = argv[1];
 		port = atoi(argv[2]);
-		filename = argv[3];
 	}
 	
 
