@@ -117,8 +117,6 @@ return fd;
 //Returns number of byte reaad, -1 otherwise
 int readFile(int fd, void *buf){
 
-
-
 return -1;
 }
 
@@ -126,9 +124,32 @@ return -1;
 //Returns number of bytes written, -1 otherwise
 int writeFile(int fd, void *buf){
 
+	char buffer[256];
+	bzero(buffer, 256);
+	strcat(buffer, "w");
+	char str[50] = "";
+	sprintf(str, "%d", fd);
+	strcat(buffer, str);
+	int n = write(sockfd, buffer, strlen(buffer));
+	
+	if(n < 0)
+		error("Sending error in writeFile");
+	
+	bzero(buffer, 256);
+	
+	n =  write(sockfd, buf, strlen(buf));
+	if(n < 0)
+		error("Sending error in writeFile");
+	
+	usleep(1000);
+	n = read(sockfd, buffer, sizeof(buffer));
+	if(n < 0)
+		error("Receiving error in writeFile");
+	
+	int ret = atoi(buffer);
+	
 
-
-return -1;
+return ret;
 }
 
 //Returns info about the file

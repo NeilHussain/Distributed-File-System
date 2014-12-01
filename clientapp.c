@@ -83,7 +83,8 @@ void ReadFile(char* filename){
 void WriteFile(char* filename){
 
 	//need to get file descripter from filename or something like that
-	printf("File: %s\n", filename);
+	int ret = writeFile(6, "hello");
+	printf("bytes written into %s: %d\n", filename, ret);
 
 }
 void CloseFile(int fd){
@@ -145,7 +146,7 @@ int running = 1;
 			ReadFile(file);
 
 		}else if(strcmp(input, "write\n") == 0){
-			
+			WriteFile("somefile");
 		}else if(strcmp(input, "close\n") == 0){
 			
 			printf("\nWhat file would you like to close? (File Descriptor)\n");
