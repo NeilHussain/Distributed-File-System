@@ -311,7 +311,7 @@ int main(int argc, char *argv[]){
 			
 			if(status){
 
-
+<<<<<<< HEAD
 					if(errno == EEXIST)
 					error("directory already in use");
 				else
@@ -330,8 +330,28 @@ int main(int argc, char *argv[]){
 			}
 				//printf("basepath: %s\n", baseFilepath);
 				//Don't need an error here, just use that path when making/reading files
-			
+				
+=======
+				
 
+				//printf("basepath: %s\n", baseFilepath);
+				//Don't need an error here, just use that path when making/reading files
+				if(errno == EEXIST)
+					error("directory already in use");
+				else
+					error("Some error occurs in directory creation");
+			}
+>>>>>>> c273bf42e40ced1cefe7d5d4d4b2e8766cf0612b
+			
+			if(filepath[strlen(filepath)-1] != '/'){
+					filepath[strlen(filepath)] = '/';
+					filepath[strlen(filepath)+1] = '\0';
+				
+					
+			
+				
+				baseFilepath = filepath;
+				}
 			
 		}else{
 			printf("Wrong argument formatting!\n");
