@@ -63,7 +63,7 @@ int readFile(int fd, void* buffer){
 
 	read(fd, buffer, numBytes);
 
-	printf("Buffer in readfile: %s\n", buffer);
+	//printf("Buffer in readfile: %s\n", buffer);
 	return numBytes;
 }
 
@@ -162,25 +162,26 @@ int socketNum = *socket;
 				printf("Buffer: %s, Length: %d\n",buffer, (int)strlen(buffer));
 							
 				bzero(buffer, 256);
-			break;
+				break;
 			case 'r':
-			{
+				puts("read block\n");
 				int fd = atoi(buffer+1);
-				
+				printf("read: %d\n", fd);
 				//char* fileContents = malloc(sizeof(char) * 1024);
-				char* fileContents = "";
-				int numBytes = 0;
+				char fileContents[1024];
+				bzero(fileContents, 1024);
+				//int numBytes = 0;
 
-				read(fd, fileContents, numBytes);
-				printf("fileContents: %s", fileContents);				
+				int ret = read(fd, fileContents, 1023);
+				printf("fileContents: %s\n", fileContents);				
 
 				int n = write(socketNum ,fileContents, 1024);
 
 				if(n < 0){
 					//error
-				}
+				
 				//bzero(buffer, 256);
-			}				
+					}				
 				break;
 			case 'o':
 				//char filename; 
@@ -226,6 +227,7 @@ int socketNum = *socket;
 				ssize_t ret = write(fd, buffer, strlen(buffer));
 				bzero(buffer, 1024);
 				sprintf(buffer, "%zd", ret);
+				
 				
 				n = write(socketNum, buffer, 1024);
 
