@@ -63,7 +63,7 @@ void ReadFile(int fd){
 	if(ret >= 0){
 		printf("Read Response %s", buff);
 	}else{
-		printf("Readfile failure return value: %d", ret);
+		printf("File not found", ret);
 		
 	}
 

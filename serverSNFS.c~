@@ -197,7 +197,7 @@ int socketNum = *socket;
 				}
 
 				printf("Writing to socket: %s\n", fileContents);
-				write(*socket, fileContents, ret);
+				write(*socket, fileContents, strlen(fileContents));
 
 				//int n = write(socketNum ,fileContents, 1024);
 

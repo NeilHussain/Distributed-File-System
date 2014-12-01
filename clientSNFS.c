@@ -223,6 +223,10 @@ return 0;
 //Closes the given file, should fail on illegal operations
 int closeFile(int fd){
 
+	if(fd == 0){
+		return -1;
+	}
+
 char buffer[256];
 char temp[256];
 	bzero(buffer, 256);

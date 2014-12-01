@@ -191,8 +191,11 @@ int socketNum = *socket;
 				//printf("file contents: %s\n", fileContents);
 				printf("numbytes: %zd\n", ret);
 				
-				if(ret <= 0){
+				if(ret == 0){
 				strcpy(fileContents, "File is empty");
+				
+				}else if(ret<0){
+				strcpy(fileContents, "File not found");
 
 				}
 
