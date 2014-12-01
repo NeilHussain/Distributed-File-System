@@ -30,8 +30,16 @@ struct permission* nextPerm;
 };
 typedef struct permission* permPtr;
 
+struct creatTime{
+	char ctime[30];
+	int fd;
+	struct creatTime* nextTime;
+};
+
+struct creatTime* head;
 struct fileStat{
 	size_t file_size;
+	char ctime[30];
 	time_t access_time;
 	time_t mod_time;
 };
@@ -59,7 +67,6 @@ int readFile(int fd, void* buffer){
 	return numBytes;
 }
 
-
 int closeFile(int fd){
 
 	return (close(fd));
@@ -71,11 +78,40 @@ int openFile(char* name){
 
 
 printf("OpenFile in server: %s\n", name);
+
+struct stat buffer;
+int flag = 0;
+if(stat(name, &buffer)){
+	printf("First time creation!\n");
+	flag = 1;
+}
 int fd = open(name, O_RDWR | O_CREAT, 0644);
 
-
-//give this file some value and send it back, store it in the LL
-
+if(flag == 1){
+	
+	char currTime[30];
+	time_t rawtime;
+	time(&rawtime);
+	struct tm* info;
+	info = localtime(&rawtime);
+	strftime(currTime, 30, "%b %d %H:%M", info);
+	printf("creation time: %s\n", currTime);
+	if(!head){
+		head = malloc(sizeof(struct creatTime));
+		strcpy(head->ctime, currTime);
+		head->fd = fd;
+	}else{
+		struct creatTime* temp;
+		temp = head;
+		if(temp){
+			while(temp->nextTime)
+				temp = temp->nextTime;
+		}
+		temp->nextTime = malloc(sizeof(struct creatTime));
+		strcpy(temp->nextTime->ctime, currTime);
+		temp->nextTime->fd = fd;
+	}
+}
 return fd;
 
 }
@@ -130,15 +166,19 @@ int socketNum = *socket;
 			{
 				int fd = atoi(buffer+1);
 				
-				char* fileContents = malloc(sizeof(char) * 1024);
-				readFile(fd, fileContents);
-				
+				//char* fileContents = malloc(sizeof(char) * 1024);
+				char* fileContents = "";
+				int numBytes = 0;
+
+				read(fd, fileContents, numBytes);
+				printf("fileContents: %s", fileContents);				
+
 				int n = write(socketNum ,fileContents, 1024);
 
 				if(n < 0){
 					//error
 				}
-				bzero(buffer, 256);
+				//bzero(buffer, 256);
 			}				
 				break;
 			case 'o':
@@ -213,7 +253,13 @@ int socketNum = *socket;
 				    file1.file_size = st.st_size;
 				    file1.access_time = st.st_atime;
 				    file1.mod_time = st.st_mtime;
-				    
+				    struct creatTime* temp = head;
+				    for(; temp; temp = temp->nextTime){
+				    	if(temp->fd == fd){
+						strcpy(file1.ctime, temp->ctime);
+						break;
+						}
+				    }
 				    int n = write(socketNum , &file1, sizeof(file1));
 					if(n < 0){
 					    error("error in sending fileStat");

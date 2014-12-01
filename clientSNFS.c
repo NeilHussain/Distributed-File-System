@@ -1,3 +1,4 @@
+#define _BSD_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -117,7 +118,7 @@ return fd;
 int readFile(int fd, void *buf){
 
 	char buffer[1024] = "";
-	strcat(buffer, "r");
+	buffer[0] = 'r';
 	
 	char str[] = "";
 	sprintf(str, "%d", fd);
@@ -130,7 +131,8 @@ int readFile(int fd, void *buf){
 	usleep(1000);
 
 	n = read(sockfd, buffer, strlen(buffer));
-
+	
+	strcpy(buf, buffer);
 	
 
 
@@ -154,9 +156,8 @@ int statFile(int fd, struct fileStat *buf){
 	char str[50] = "";
 	sprintf(str, "%d", fd);
 	strcat(buffer, str);
-	printf("%s\n", buffer);	
 	int n = write(sockfd, buffer, strlen(buffer));
-	
+		
 	if(n < 0){
 		error("Sending error in statFile");
 		exit(1);
@@ -167,7 +168,7 @@ int statFile(int fd, struct fileStat *buf){
     if(n < 0){
 		error("Reading fileStat error");
 	}
-	
+/*	
 	printf("filesize is %Zu\n", buf->file_size);
 					char atime[30], mtime[30];
 					struct tm* timeinfo;
@@ -178,6 +179,7 @@ int statFile(int fd, struct fileStat *buf){
 					timeinfo = localtime(&(buf->mod_time));
 					strftime(mtime, 30, "%b %d %H:%M", timeinfo);
 					printf("modi time: %s\n", mtime);
+*/
 return 0;
 }
 
